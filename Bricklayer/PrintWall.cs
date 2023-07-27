@@ -30,11 +30,11 @@ internal class PrintWall
                 if (brick.Width / 10 == 1)
                 {
                     RedConsole();
-                    Console.Write(" ");
+                    Console.Write("  ");
                 }
                 else
                 {
-                    Console.Write("  ");
+                    Console.Write("    ");
                 }
                 Console.ResetColor();
             }
