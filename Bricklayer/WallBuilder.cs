@@ -2,11 +2,12 @@ namespace Bricklayer;
 
 internal class WallBuilder
 {
-    public readonly GreyPattern greyPattern;
-    public int totalWidth = 180;
-    public int totalHeight = 90;
+    private int TotalWidth { get; } = 180;
+    private int TotalHeight { get; } = 90;
 
-    public Brick cubicRedBrick = new Brick
+    private readonly GreyPattern greyPattern;
+
+    private Brick cubicRedBrick = new Brick
     {
         Width = 10,
         Height = 10,
@@ -14,7 +15,7 @@ internal class WallBuilder
         Color = Color.Red
     };
 
-    public Brick parallelepipedRedBrick = new Brick
+    private Brick parallelepipedRedBrick = new Brick
     {
         Width = 20,
         Height = 10,
@@ -22,7 +23,7 @@ internal class WallBuilder
         Color = Color.Red
     };
 
-    public Brick parallelepipedGreyBrick = new Brick
+    private Brick parallelepipedGreyBrick = new Brick
     {
         Width = 20,
         Height = 10,
@@ -43,7 +44,7 @@ internal class WallBuilder
         int currentRowNumber = 1;
 
         // built the wall
-        while (builtHeight < totalHeight)
+        while (builtHeight < TotalHeight)
         {
             var currentRow = NewBricksRow(currentRowNumber);
 
@@ -55,7 +56,7 @@ internal class WallBuilder
 
             currentRowNumber++;
             builtHeight += currentRow[0].Height;
-            if (builtHeight < totalHeight)
+            if (builtHeight < TotalHeight)
             {
                 Array.Resize<RowBricks>(ref wall, currentRowNumber);
             }
@@ -64,7 +65,7 @@ internal class WallBuilder
         return wall;
     }
 
-    public Brick[] NewBricksRow(int currentRowNumber)
+    private Brick[] NewBricksRow(int currentRowNumber)
     {
         Brick[] currentRow = new Brick[1];
 
@@ -72,16 +73,31 @@ internal class WallBuilder
         int currentColNumber = 1;
 
         Brick currentBrick = parallelepipedRedBrick;
-        while (builtWidth < totalWidth)
+        bool isMissingCubicBrick = false;
+        while (builtWidth < TotalWidth)
         {
-            bool lastCol = builtWidth + parallelepipedRedBrick.Width >= totalWidth;
+            bool lastBrickOfTheRow = builtWidth + currentBrick.Width >= TotalWidth;
 
-            currentBrick = PlaceBrickInRow(currentColNumber, currentRowNumber, lastCol);
+            currentBrick = PlaceBrickInRow(currentColNumber, currentRowNumber, lastBrickOfTheRow);
+
+            bool lastBrickHasToBeReplaced = greyPattern.IsRectangular && builtWidth % 20 != 0 && currentBrick.Color == Color.Grey;
+            if (lastBrickHasToBeReplaced) {
+                currentRow[currentColNumber - 2] = cubicRedBrick;
+                isMissingCubicBrick = true;
+                builtWidth -= parallelepipedRedBrick.Width - cubicRedBrick.Width;
+            }
+
+            bool currentBrickHasToBeCubic = currentColNumber > 1 && currentRow[currentColNumber - 2].Color == Color.Grey && isMissingCubicBrick;
+            if (currentBrickHasToBeCubic) {
+                isMissingCubicBrick = false;
+                currentBrick = cubicRedBrick;
+            }
+
             currentRow[currentColNumber - 1] = currentBrick;
 
             builtWidth += currentBrick.Width;
             currentColNumber++;
-            if (!lastCol)
+            if (!lastBrickOfTheRow)
             {
                 Array.Resize<Brick>(ref currentRow, currentColNumber);
             }
@@ -89,7 +105,7 @@ internal class WallBuilder
         return currentRow;
     }
 
-    public Brick PlaceBrickInRow(int currentColNumber, int currentRowNumber, bool lastCol)
+    private Brick PlaceBrickInRow(int currentColNumber, int currentRowNumber, bool lastCol)
     {
         Brick currentBrick = parallelepipedRedBrick;
         if (greyPattern.IsContainingBrick(currentColNumber, currentRowNumber))

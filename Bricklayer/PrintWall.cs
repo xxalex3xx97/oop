@@ -56,7 +56,7 @@ internal class PrintWall
 
     public static void GreyConsole()
     {
-        Console.ForegroundColor = ConsoleColor.Gray;
-        Console.BackgroundColor = ConsoleColor.Gray;
+        Console.ForegroundColor = ConsoleColor.DarkGray;
+        Console.BackgroundColor = ConsoleColor.DarkGray;
     }
 }

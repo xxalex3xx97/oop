@@ -2,16 +2,18 @@ namespace Bricklayer;
 
 internal class GreyPattern
 {
-    public RowPattern[] pattern;
+    public bool IsRectangular { get; }
+    internal RowPattern[] Pattern { get; set; }
 
-    public GreyPattern(RowPattern[] pattern)
+    public GreyPattern(RowPattern[] pattern, bool isRectangular = false)
     {
-        this.pattern = pattern;
+        Pattern = pattern;
+        IsRectangular = isRectangular;
     }
 
     public bool IsContainingBrick(int currentColNumber, int currentRowNumber)
     {
-        foreach (var greyRow in pattern)
+        foreach (var greyRow in Pattern)
         {
             if (greyRow.RowNumber != currentRowNumber) { continue; }
             foreach (var greyCol in greyRow.ColumnsNumber)
